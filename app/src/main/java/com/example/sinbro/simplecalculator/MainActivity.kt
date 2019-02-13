@@ -13,15 +13,15 @@ class MainActivity : AppCompatActivity() {
     private var state: StateType = StateType.Empty
     private var emphasisBalance = 0
 
-    enum class StateType {
-        Digit,
-        Operator,
-        Dot,
-        DigitAfterDot,
-        OpenEmphasis,
-        CloseEmphasis,
-        Error,
-        Empty
+    enum class StateType(val num: Int) {
+        Digit(0),
+        Operator(1),
+        Dot(2),
+        DigitAfterDot(3),
+        OpenEmphasis(4),
+        CloseEmphasis(5),
+        Error(6),
+        Empty(7)
 
     }
 
@@ -33,16 +33,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
-        outState?.putInt("state", when(state) {
-            StateType.Digit -> 0
-            StateType.Operator -> 1
-            StateType.Dot -> 2
-            StateType.DigitAfterDot -> 3
-            StateType.OpenEmphasis -> 4
-            StateType.CloseEmphasis -> 5
-            StateType.Error -> 6
-            StateType.Empty -> 7
-        })
+        outState?.putInt("state", state.num)
         outState?.putInt("emphasisBalance", emphasisBalance)
         outState?.putCharSequence("text", textInput.text)
         super.onSaveInstanceState(outState)
@@ -66,7 +57,7 @@ class MainActivity : AppCompatActivity() {
                 5 -> StateType.CloseEmphasis
                 6 -> StateType.Error
                 7 -> StateType.Empty
-                else -> StateType.Error
+                else -> StateType.Empty
             }
         }
     }
