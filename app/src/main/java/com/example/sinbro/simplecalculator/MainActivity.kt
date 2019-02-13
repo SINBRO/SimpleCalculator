@@ -10,9 +10,7 @@ import net.objecthunter.exp4j.ExpressionBuilder
 
 class MainActivity : AppCompatActivity() {
     private lateinit var textInput: TextView
-
     private var state: StateType = StateType.Empty
-
     private var emphasisBalance = 0
 
     enum class StateType {
@@ -24,12 +22,53 @@ class MainActivity : AppCompatActivity() {
         CloseEmphasis,
         Error,
         Empty
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         textInput = findViewById(R.id.textInput)
+        //restoreState(savedInstanceState)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        outState?.putInt("state", when(state) {
+            StateType.Digit -> 0
+            StateType.Operator -> 1
+            StateType.Dot -> 2
+            StateType.DigitAfterDot -> 3
+            StateType.OpenEmphasis -> 4
+            StateType.CloseEmphasis -> 5
+            StateType.Error -> 6
+            StateType.Empty -> 7
+        })
+        outState?.putInt("emphasisBalance", emphasisBalance)
+        outState?.putCharSequence("text", textInput.text)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        restoreState(savedInstanceState)
+    }
+
+    private fun restoreState(savedState: Bundle?) {
+        if (savedState != null) {
+            textInput.text = savedState.getCharSequence("text")
+            emphasisBalance = savedState.getInt("emphasisBalance")
+            state = when(savedState.getInt("state")) {
+                0 -> StateType.Digit
+                1 -> StateType.Operator
+                2 -> StateType.Dot
+                3 -> StateType.DigitAfterDot
+                4 -> StateType.OpenEmphasis
+                5 -> StateType.CloseEmphasis
+                6 -> StateType.Error
+                7 -> StateType.Empty
+                else -> StateType.Error
+            }
+        }
     }
 
     fun onDigit(view: View) {
@@ -225,7 +264,7 @@ class MainActivity : AppCompatActivity() {
                     var hasDot = false
                     for (i in textInput.text) {
                         if (i == '.') {
-                            hasDot = true;
+                            hasDot = true
                             break
                         }
                     }
